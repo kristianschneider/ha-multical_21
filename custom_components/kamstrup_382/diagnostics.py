@@ -1,4 +1,4 @@
-"""Diagnostics support for kamstrup_403."""
+"""Diagnostics support for kamstrup_382."""
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant

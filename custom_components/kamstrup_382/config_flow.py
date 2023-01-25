@@ -1,4 +1,4 @@
-"""Adds config flow for Kamstrup 403."""
+"""Adds config flow for Kamstrup 382."""
 from homeassistant import config_entries
 from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
 from homeassistant.core import callback
@@ -9,7 +9,7 @@ from .const import DEFAULT_BAUDRATE, DEFAULT_SCAN_INTERVAL, DEFAULT_TIMEOUT, DOM
 
 
 class KamstrupFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for Kamstrup 403."""
+    """Config flow for Kamstrup 382."""
 
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL

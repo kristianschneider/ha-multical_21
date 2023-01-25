@@ -1,19 +1,19 @@
-"""Constants for Kamstrup 403."""
+"""Constants for Kamstrup 382."""
 
 from typing import Final
 
 # Base component constants
-NAME: Final = "Kamstrup 403"
-DOMAIN: Final = "kamstrup_403"
+NAME: Final = "Kamstrup 382"
+DOMAIN: Final = "kamstrup_382"
 VERSION: Final = "2.1.0"
-MODEL: Final = "403"
+MODEL: Final = "382"
 MANUFACTURER: Final = "Kamstrup"
-ATTRIBUTION: Final = "Data provided by Kamstrup 403 meter"
+ATTRIBUTION: Final = "Data provided by Kamstrup 382 meter"
 
 # Defaults
 DEFAULT_NAME: Final = NAME
-DEFAULT_BAUDRATE: Final = 1200
-DEFAULT_SCAN_INTERVAL: Final = 3600
+DEFAULT_BAUDRATE: Final = 9600
+DEFAULT_SCAN_INTERVAL: Final = 60
 DEFAULT_TIMEOUT: Final = 1.0
 
 # Platforms

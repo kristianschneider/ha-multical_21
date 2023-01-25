@@ -1,0 +1,11 @@
+{
+  "domain": "kamstrup_382",
+  "name": "Kamstrup 382",
+  "documentation": "https://github.com/jukkapirinen/ha-kamstrup_382/blob/main/README.md",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/jukkapirinen/ha-kamstrup_382/issues",
+  "version": "2.1.0",
+  "config_flow": true,
+  "codeowners": ["@golles"],
+  "requirements": ["pyserial==3.5"]
+}
