@@ -1,8 +1,8 @@
 """
-Custom integration to integrate kamstrup_382 with Home Assistant.
+Custom integration to integrate multical_21 with Home Assistant.
 
 For more details about this integration, please refer to
-https://github.com/custom-components/kamstrup_382
+https://github.com/kristianschneider/ha-multical_21/
 """
 from datetime import timedelta
 import logging

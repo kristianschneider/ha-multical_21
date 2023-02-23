@@ -18,55 +18,39 @@ from .const import DEFAULT_NAME, DOMAIN
 
 DESCRIPTIONS: list[SensorEntityDescription] = [
     SensorEntityDescription(
-        key="1",  # 0x0001
-        name="TotalEnergyIn",
-	icon="mdi:lightning-bolt",
-        device_class=SensorDeviceClass.ENERGY,
+        key="68",  # 0x0044
+        name="V1",
+	icon="mdi:water",
+        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     SensorEntityDescription(
-        key="13",  # 0x000d
-        name="EnergyInHiRes",
-	icon="mdi:lightning-bolt",
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-    ),
-    SensorEntityDescription(
-        key="1023",  # 0x03ff
-        name="CurrentPowerIn",
-	icon="mdi:lightning-bolt",
-        device_class=SensorDeviceClass.POWER,
+        key="243",  # 0x00f3
+        name="V1Reverse",
+	icon="mdi:water-sync",
+        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        key="39",  # 0x0027
-        name="MaxPower",
-	icon="mdi:lightning-bolt",
-        device_class=SensorDeviceClass.POWER,
+        key="74",  # 0x004a
+        name="Flow",
+	icon="mdi:waves",
+        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
-        key="1054",  # 0x041e
-        name="VoltageP1",
-	icon="mdi:alpha-v-circle-outline",
-        device_class=SensorDeviceClass.VOLTAGE,
+        key="1004",  # 0x03ec
+        name="HoursCounter",
+	icon="mdi:clock",
+        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
-        key="1055",  # 0x041f
-        name="VoltageP2",
-	icon="mdi:alpha-v-circle-outline",
-        device_class=SensorDeviceClass.VOLTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_registry_enabled_default=False,
-    ),
-    SensorEntityDescription(
-        key="1056",  # 0x0420
-        name="VoltageP3",
-	icon="mdi:alpha-v-circle-outline",
-        device_class=SensorDeviceClass.VOLTAGE,
+        key="99",  # 0x0063
+        name="Info",
+	icon="mdi:information",
+        device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
     ),
