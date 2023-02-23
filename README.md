@@ -3,8 +3,6 @@
 
 Multical 21 custom component for Home Assistant.
 
-<img width="660" alt="info" src="https://user-images.githubusercontent.com/2211503/200671065-201f84bc-0d01-4a87-8fd9-3da3beedfb5d.png">
-
 ## Requirements
 
 To use this custom component, you'll need an optical eye and connect your machine running Home Assistant directly with the optical eye to the Kamstrup meter.
