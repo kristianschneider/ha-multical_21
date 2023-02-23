@@ -47,8 +47,6 @@ The port should look like this: `/dev/serial/by-id/usb-FTDI_FT230X_Basic_UART_D3
 Some meters contain a battery, and communicating with the meter does impact battery life. By default, this component updates every `3600` seconds (1 hour). This is configurable. Also, since version `2.0.1` you can also configure the serial timeout. The default value is `1.0` seconds, if you get the error `Finished update, No readings from the meter. Please check the IR connection` you can try to increase this value. Fractional numbers are allowed (eg. `0.5`).
 You can do this by pressing `configure` on the Integrations page:
 
-<img width="300" alt="integration" src="https://user-images.githubusercontent.com/2211503/200671075-39c7a812-42a2-4a4d-8934-6ea37517a400.png"> <img width="300" alt="configure" src="https://user-images.githubusercontent.com/2211503/201747344-b019693a-1d88-4ca1-9a28-87fa24992e13.png">
-
 ## Collect logs
 
 When you want to report an issue, please add logs from this component. You can enable logging for this component by configuring the logger in Home Assistant as follows:
@@ -56,6 +54,6 @@ When you want to report an issue, please add logs from this component. You can e
 logger:
   default: warn
   logs:
-    custom_components.kamstrup_403: debug
+    custom_components.multical_21: debug
 ```
 More info can be found on the [Home Assistant logger integration page](https://www.home-assistant.io/integrations/logger)
