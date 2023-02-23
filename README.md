@@ -1,16 +1,7 @@
-# Kamstrup 403
+# Multical 21
 
-[![GitHub Release][releases-shield]][releases]
-[![GitHub Repo stars][stars-shield]][stars]
-[![License][license-shield]](LICENSE)
-[![GitHub Activity][commits-shield]][commits]
-[![Code coverage][codecov-shield]][codecov]
-[![hacs][hacs-shield]][hacs]
-[![hacs][hacs-installs-shield]][hacs]
-[![Project Maintenance][maintenance-shield]][maintainer]
-[![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
 
-Multical 403 custom component for Home Assistant.
+Multical 21 custom component for Home Assistant.
 
 <img width="660" alt="info" src="https://user-images.githubusercontent.com/2211503/200671065-201f84bc-0d01-4a87-8fd9-3da3beedfb5d.png">
 
