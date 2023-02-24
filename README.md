@@ -15,7 +15,7 @@ I ordered it from [here](https://www.aliexpress.com/item/1005004567409202.html?s
 
 ### HACS
 
-This component can easily be installed in your Home Assistant using HACS.
+This component can easily be installed in your Home Assistant by [adding this repository in HACS](https://hacs.xyz/docs/faq/custom_repositories/).
 
 
 ### Manual
