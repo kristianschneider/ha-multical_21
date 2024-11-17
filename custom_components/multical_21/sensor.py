@@ -29,7 +29,7 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         name="V1Reverse",
 	icon="mdi:water-sync",
         device_class=SensorDeviceClass.WATER,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.NONE,
     ),
     SensorEntityDescription(
         key="74",  # 0x004a
