@@ -38,12 +38,19 @@ async def async_setup(_hass: HomeAssistant, _config: Config) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the integration from a config entry."""
+    client = Kamstrup(
+        port=entry.data["port"],
+        baudrate=entry.data.get("baudrate", 9600),  # Default baudrate if not provided
+        timeout=entry.data.get("timeout", 10)      # Default timeout if not provided
+    )
+
     coordinator = KamstrupUpdateCoordinator(
         hass,
-        client=Kamstrup(entry.data["port"]),
+        client=client,
         scan_interval=entry.options.get("scan_interval", 60),
         device_info=entry.data["device_info"],
     )
+
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
