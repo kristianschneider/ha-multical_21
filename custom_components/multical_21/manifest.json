@@ -4,7 +4,7 @@
   "documentation": "https://github.com/kristianschneider/ha-multical_21//blob/main/README.md",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/kristianschneider/ha-multical_21//issues",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "config_flow": true,
   "codeowners": ["@kristianschneider"],
   "requirements": ["pyserial==3.5"]
