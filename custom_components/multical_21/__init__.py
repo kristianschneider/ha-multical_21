@@ -37,52 +37,17 @@ async def async_setup(_hass: HomeAssistant, _config: Config) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up this integration using UI."""
-    if hass.data.get(DOMAIN) is None:
-        hass.data.setdefault(DOMAIN, {})
-
-    port = entry.data.get(CONF_PORT)
-    scan_interval_seconds = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
-    scan_interval = timedelta(seconds=scan_interval_seconds)
-    timeout_seconds = entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)
-
-    _LOGGER.debug(
-        "Set up entry, with scan_interval of %s seconds and timeout of %s seconds",
-        scan_interval_seconds,
-        timeout_seconds,
-    )
-
-    try:
-        client = Kamstrup(port, DEFAULT_BAUDRATE, timeout_seconds)
-    except Exception as exception:
-        _LOGGER.error("Can't establish a connection with %s", port)
-        raise ConfigEntryNotReady() from exception
-
-    device_info = DeviceInfo(
-        entry_type=DeviceEntryType.SERVICE,
-        identifiers={(DOMAIN, port)},
-        manufacturer=NAME,
-        name=NAME,
-        model=VERSION,
-    )
-
+    """Set up the integration from a config entry."""
     coordinator = KamstrupUpdateCoordinator(
-        hass=hass, client=client, scan_interval=scan_interval, device_info=device_info
+        hass,
+        client=Kamstrup(entry.data["port"]),
+        scan_interval=entry.options.get("scan_interval", 60),
+        device_info=entry.data["device_info"],
     )
-
-    hass.data[DOMAIN][entry.entry_id] = coordinator
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    )
-
-    # for platform in PLATFORMS:
-    #     if entry.options.get(platform, True):
-    #         hass.async_create_task(
-    #             hass.config_entries. async_forward_entry_setups(entry, platform)
-    #         )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     await coordinator.async_config_entry_first_refresh()
 
@@ -93,8 +58,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-        del hass.data[DOMAIN][entry.entry_id]
+    """Unload a config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unload_ok:
+        coordinator = hass.data[DOMAIN].pop(entry.entry_id)
+        await coordinator.async_close()
 
     return unload_ok
 
