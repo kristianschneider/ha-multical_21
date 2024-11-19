@@ -10,6 +10,7 @@ To use this custom component, you'll need an optical eye and connect your machin
 The optical eye looks like this:<br>
 ![image](https://user-images.githubusercontent.com/6593720/220914030-3ca8bec3-b302-4ed7-a0b8-c4858b0c8120.png)
 I ordered it from [here](https://www.aliexpress.com/item/1005004567409202.html?spm=a2g0o.order_list.order_list_main.18.43e81802zaII7n)
+You can also 3d Print [this mount ](https://makerworld.com/en/models/490708#profileId-404169)
 
 ## Installation
 

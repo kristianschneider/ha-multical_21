@@ -28,7 +28,7 @@ from .const import (
 )
 from .pykamstrup.kamstrup import Kamstrup
 
-_LOGGER: logging.Logger = logging.getLogger(__package__)
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(_hass: HomeAssistant, _config: Config) -> bool:
@@ -37,19 +37,40 @@ async def async_setup(_hass: HomeAssistant, _config: Config) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up the integration from a config entry."""
-    client = Kamstrup(
-        port=entry.data["port"],
-        baudrate=entry.data.get("baudrate", 9600),  # Default baudrate if not provided
-        timeout=entry.data.get("timeout", 10)      # Default timeout if not provided
+    """Set up this integration using UI."""
+    if hass.data.get(DOMAIN) is None:
+        hass.data.setdefault(DOMAIN, {})
+
+    port = entry.data.get(CONF_PORT)
+    scan_interval_seconds = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    scan_interval = timedelta(seconds=scan_interval_seconds)
+    timeout_seconds = entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)
+
+    _LOGGER.debug(
+        "Set up entry, with scan_interval of %s seconds and timeout of %s seconds",
+        scan_interval_seconds,
+        timeout_seconds,
+    )
+
+    try:
+        client = Kamstrup(port, DEFAULT_BAUDRATE, timeout_seconds)
+    except Exception as exception:
+        _LOGGER.error("Can't establish a connection with %s", port)
+        raise ConfigEntryNotReady() from exception
+
+    device_info = DeviceInfo(
+        entry_type=DeviceEntryType.SERVICE,
+        identifiers={(DOMAIN, port)},
+        manufacturer=NAME,
+        name=NAME,
+        model=VERSION,
     )
 
     coordinator = KamstrupUpdateCoordinator(
-        hass,
-        client=client,
-        scan_interval=entry.options.get("scan_interval", 60),
-        device_info=entry.data["device_info"],
+        hass=hass, client=client, scan_interval=scan_interval, device_info=device_info
     )
+
+    hass.data[DOMAIN][entry.entry_id] = coordinator
 
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
@@ -105,6 +126,10 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
         """Remove a command from the commands list."""
         _LOGGER.debug("Unregister command %s", command)
         self._commands.remove(command)
+    async def async_close(self) -> None:
+        """Close resources."""
+        _LOGGER.debug("Closing Kamstrup connection")
+        self.kamstrup = None
 
     async def _async_update_data(self) -> dict[int, Any]:
         """Update data via library."""
