@@ -28,21 +28,21 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         key="243",  # 0x00f3
         name="V1Reverse",
 	icon="mdi:water-sync",
-	    device_class=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.WATER,
+        state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     SensorEntityDescription(
         key="74",  # 0x004a
         name="Flow",
 	icon="mdi:waves",
-	    device_class=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.WATER,
+        state_class=None,
     ),
     SensorEntityDescription(
         key="1004",  # 0x03ec
         name="HoursCounter",
 	icon="mdi:clock",
-        device_class=None,
+        device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
     ),
@@ -51,7 +51,7 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         name="Info",
 	icon="mdi:information",
         device_class=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=None,
         entity_registry_enabled_default=False,
     ),
 ]
