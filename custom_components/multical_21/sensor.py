@@ -1,4 +1,5 @@
 """Sensor platform for kamstrup_382."""
+
 from homeassistant.components.sensor import (
     DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
@@ -20,28 +21,28 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
     SensorEntityDescription(
         key="68",  # 0x0044
         name="V1",
-	icon="mdi:water",
-	    device_class=None,
-        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:water",
+        device_class=SensorDeviceClass.WATER,
+        state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     SensorEntityDescription(
         key="243",  # 0x00f3
         name="V1Reverse",
-	icon="mdi:water-sync",
+        icon="mdi:water-sync",
         device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     SensorEntityDescription(
         key="74",  # 0x004a
         name="Flow",
-	icon="mdi:waves",
+        icon="mdi:waves",
         device_class=SensorDeviceClass.WATER,
         state_class=None,
     ),
     SensorEntityDescription(
         key="1004",  # 0x03ec
         name="HoursCounter",
-	icon="mdi:clock",
+        icon="mdi:clock",
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
@@ -49,12 +50,13 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
     SensorEntityDescription(
         key="99",  # 0x0063
         name="Info",
-	icon="mdi:information",
+        icon="mdi:information",
         device_class=None,
         state_class=None,
         entity_registry_enabled_default=False,
     ),
 ]
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -130,4 +132,3 @@ class KamstrupMeterSensor(KamstrupSensor):
             return self.coordinator.data[self.int_key].get("unit", None)
 
         return None
-
