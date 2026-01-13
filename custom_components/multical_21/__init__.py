@@ -10,12 +10,11 @@ from typing import Any, List
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
-from homeassistant.core import Config, HomeAssistant
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-import serial
 
 from .const import (
     DEFAULT_BAUDRATE,
@@ -31,7 +30,7 @@ from .pykamstrup.kamstrup import Kamstrup
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(_hass: HomeAssistant, _config: Config) -> bool:
+async def async_setup(_hass: HomeAssistant, _config: dict) -> bool:
     """Set up this integration using YAML is not supported."""
     return True
 
@@ -52,8 +51,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         timeout_seconds,
     )
 
+    # Initialize client in executor to avoid blocking the event loop
     try:
-        client = Kamstrup(port, DEFAULT_BAUDRATE, timeout_seconds)
+        client = await hass.async_add_executor_job(
+            _init_kamstrup_client, port, timeout_seconds
+        )
     except Exception as exception:
         _LOGGER.error("Can't establish a connection with %s", port)
         raise ConfigEntryNotReady() from exception
@@ -67,12 +69,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     coordinator = KamstrupUpdateCoordinator(
-        hass=hass, client=client, scan_interval=scan_interval, device_info=device_info
+        hass=hass,
+        client=client,
+        scan_interval=scan_interval,
+        device_info=device_info,
     )
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
-
-
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
     for platform in PLATFORMS:
@@ -95,12 +98,22 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         coordinator = hass.data[DOMAIN].pop(entry.entry_id)
         await coordinator.async_close()
-
     return unload_ok
 
 
 async def async_reload_entry(hass, entry):
+    """Reload config entry."""
     await hass.config_entries.async_reload(entry.entry_id)
+
+
+def _init_kamstrup_client(port: str, timeout: int) -> Kamstrup:
+    """Initialize Kamstrup client in executor."""
+    return Kamstrup(port, DEFAULT_BAUDRATE, timeout)
+
+
+def _read_kamstrup_values(client: Kamstrup, commands: List[int]) -> dict:
+    """Read values from Kamstrup in executor to avoid blocking."""
+    return client.get_values(commands)
 
 
 class KamstrupUpdateCoordinator(DataUpdateCoordinator):
@@ -116,9 +129,7 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
         """Initialize."""
         self.kamstrup = client
         self.device_info = device_info
-
         self._commands: List[int] = []
-
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=scan_interval)
 
     def register_command(self, command: int) -> None:
@@ -130,6 +141,7 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
         """Remove a command from the commands list."""
         _LOGGER.debug("Unregister command %s", command)
         self._commands.remove(command)
+
     async def async_close(self) -> None:
         """Close resources."""
         _LOGGER.debug("Closing Kamstrup connection")
@@ -138,20 +150,27 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict[int, Any]:
         """Update data via library."""
         _LOGGER.debug("Start update")
-
         data = {}
 
         try:
-            values = self.kamstrup.get_values(self._commands)
-        except serial.SerialException as exception:
-            _LOGGER.error(
-                "Device disconnected or multiple access on port? \nException: %e",
-                exception,
+            # Run blocking I/O in executor to avoid blocking the event loop
+            values = await self.hass.async_add_executor_job(
+                _read_kamstrup_values, self.kamstrup, self._commands
             )
         except Exception as exception:
-            _LOGGER.error(
-                "Error reading multiple %s \nException: %s", self._commands, exception
-            )
+            # Check if it's a serial exception
+            exception_type = type(exception).__name__
+            if "Serial" in exception_type:
+                _LOGGER.error(
+                    "Device disconnected or multiple access on port? \nException: %s",
+                    exception,
+                )
+            else:
+                _LOGGER.error(
+                    "Error reading multiple %s \nException: %s",
+                    self._commands,
+                    exception,
+                )
             raise UpdateFailed() from exception
 
         failed_counter = len(self._commands) - len(values)
