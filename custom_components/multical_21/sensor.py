@@ -23,21 +23,26 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         name="V1",
         icon="mdi:water",
         device_class=SensorDeviceClass.WATER,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        # Changed from TOTAL_INCREASING to TOTAL to allow counter resets
+        state_class=SensorStateClass.TOTAL,
+        native_unit_of_measurement="m³",  # Default unit if device doesn't provide one
     ),
     SensorEntityDescription(
         key="243",  # 0x00f3
         name="V1Reverse",
         icon="mdi:water-sync",
         device_class=SensorDeviceClass.WATER,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        # Changed from TOTAL_INCREASING to TOTAL to allow counter resets
+        state_class=SensorStateClass.TOTAL,
+        native_unit_of_measurement="m³",  # Default unit if device doesn't provide one
     ),
     SensorEntityDescription(
         key="74",  # 0x004a
         name="Flow",
         icon="mdi:waves",
-        device_class=SensorDeviceClass.WATER,
-        state_class=None,
+        # Removed device_class as l/h (flow rate) doesn't fit WATER device class
+        device_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="1004",  # 0x03ec
@@ -45,6 +50,7 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         icon="mdi:clock",
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="h",  # Default unit: hours
         entity_registry_enabled_default=False,
     ),
     SensorEntityDescription(
@@ -129,6 +135,10 @@ class KamstrupMeterSensor(KamstrupSensor):
     def native_unit_of_measurement(self) -> str | None:
         """Return the unit of measurement of the sensor, if any."""
         if self.coordinator.data and self.coordinator.data[self.int_key]:
-            return self.coordinator.data[self.int_key].get("unit", None)
-
-        return None
+            device_unit = self.coordinator.data[self.int_key].get("unit", None)
+            # Use device unit if provided and not empty, otherwise fall back to description
+            if device_unit:
+                return device_unit
+        
+        # Fall back to the unit defined in the entity description
+        return self.entity_description.native_unit_of_measurement
