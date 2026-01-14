@@ -183,15 +183,16 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
                     "New value for sensor %s, value: %s %s", command, value, unit
                 )
 
-        if failed_counter == len(data):
+        # Only log error if we have commands registered but got no data
+        if len(data) == 0 and len(self._commands) > 0:
             _LOGGER.error(
                 "Finished update, No readings from the meter. Please check the IR connection"
             )
-        else:
+        elif len(self._commands) > 0:
             _LOGGER.debug(
                 "Finished update, %s out of %s readings failed",
                 failed_counter,
-                len(data),
+                len(self._commands),
             )
 
         return data
