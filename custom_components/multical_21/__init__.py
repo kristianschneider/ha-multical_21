@@ -31,7 +31,7 @@ from .pykamstrup.kamstrup import Kamstrup
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(_hass: HomeAssistant, _config: Config) -> bool:
+async def async_setup(_hass: HomeAssistant, _config: dict) -> bool:
     """Set up this integration using YAML is not supported."""
     return True
 
