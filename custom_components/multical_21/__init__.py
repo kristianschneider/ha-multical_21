@@ -6,14 +6,13 @@ https://github.com/kristianschneider/ha-multical_21/
 """
 from datetime import timedelta
 import logging
-from typing import Any, List
+from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.device_registry import DeviceEntryType
-from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import serial
 
@@ -53,7 +52,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     try:
-        client = Kamstrup(port, DEFAULT_BAUDRATE, timeout_seconds)
+        client = await hass.async_add_executor_job(
+            Kamstrup, port, DEFAULT_BAUDRATE, timeout_seconds
+        )
     except Exception as exception:
         _LOGGER.error("Can't establish a connection with %s", port)
         raise ConfigEntryNotReady() from exception
@@ -70,16 +71,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass=hass, client=client, scan_interval=scan_interval, device_info=device_info
     )
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
-
-
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
-    for platform in PLATFORMS:
-        if entry.options.get(platform, True):
-            hass.async_create_task(
-                hass.config_entries.async_forward_entry_setups(entry, [platform])
-            )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     await coordinator.async_config_entry_first_refresh()
 
@@ -99,7 +93,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return unload_ok
 
 
-async def async_reload_entry(hass, entry):
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload a config entry."""
     await hass.config_entries.async_reload(entry.entry_id)
 
 
@@ -117,7 +112,7 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
         self.kamstrup = client
         self.device_info = device_info
 
-        self._commands: List[int] = []
+        self._commands: list[int] = []
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=scan_interval)
 
@@ -130,6 +125,7 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
         """Remove a command from the commands list."""
         _LOGGER.debug("Unregister command %s", command)
         self._commands.remove(command)
+
     async def async_close(self) -> None:
         """Close resources."""
         _LOGGER.debug("Closing Kamstrup connection")
@@ -142,12 +138,15 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
         data = {}
 
         try:
-            values = self.kamstrup.get_values(self._commands)
+            values = await self.hass.async_add_executor_job(
+                self.kamstrup.get_values, self._commands
+            )
         except serial.SerialException as exception:
             _LOGGER.error(
-                "Device disconnected or multiple access on port? \nException: %e",
+                "Device disconnected or multiple access on port? \nException: %s",
                 exception,
             )
+            raise UpdateFailed() from exception
         except Exception as exception:
             _LOGGER.error(
                 "Error reading multiple %s \nException: %s", self._commands, exception

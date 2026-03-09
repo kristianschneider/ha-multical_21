@@ -120,7 +120,7 @@ class KamstrupMeterSensor(KamstrupSensor):
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
-        if self.coordinator.data and self.coordinator.data[self.int_key]:
+        if self.coordinator.data and self.coordinator.data.get(self.int_key):
             return self.coordinator.data[self.int_key].get("value", None)
 
         return None
@@ -128,7 +128,7 @@ class KamstrupMeterSensor(KamstrupSensor):
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return the unit of measurement of the sensor, if any."""
-        if self.coordinator.data and self.coordinator.data[self.int_key]:
+        if self.coordinator.data and self.coordinator.data.get(self.int_key):
             return self.coordinator.data[self.int_key].get("unit", None)
 
         return None
