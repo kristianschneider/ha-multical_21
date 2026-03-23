@@ -154,9 +154,7 @@ class Kamstrup:
 
         return (value, unit)
 
-    def get_values(
-        self, multiple_nbr: list[int]
-    ) -> (tuple[None, None] | tuple[float | None, str | None] | dict):
+    def get_values(self, multiple_nbr: list[int]) -> dict:
         """Get values from the meter"""
 
         # Construct the request.
@@ -173,11 +171,11 @@ class Kamstrup:
         # Process response.
         bytearray_data = self._receive()
         if bytearray_data is None:
-            return (None, None)
+            return {}
 
         # Check destination address and CID.
         if bytearray_data[0] != 0x3F or bytearray_data[1] != 0x10:
-            return (None, None)
+            return {}
 
         # Decode response data, containing multiple variables.
         result = {}

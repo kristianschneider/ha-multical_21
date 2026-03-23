@@ -36,5 +36,6 @@
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["baudrate", "hass", "homeassistant", "kamstrup"]
+  "cSpell.words": ["baudrate", "hass", "homeassistant", "kamstrup"],
+  "githubPullRequests.ignoredPullRequestBranches": ["main"]
 }
