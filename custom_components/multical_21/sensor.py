@@ -39,8 +39,6 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         name="Flow",
         icon="mdi:waves",
         device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
-        # Removed device_class as l/h (flow rate) doesn't fit WATER device class
-        # device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement="L/h",
     ),
