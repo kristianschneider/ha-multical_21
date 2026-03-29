@@ -4,6 +4,7 @@ Custom integration to integrate multical_21 with Home Assistant.
 For more details about this integration, please refer to
 https://github.com/kristianschneider/ha-multical_21/
 """
+
 from datetime import timedelta
 import logging
 from typing import Any, List
@@ -28,11 +29,6 @@ from .const import (
 from .pykamstrup.kamstrup import Kamstrup
 
 _LOGGER = logging.getLogger(__name__)
-
-
-async def async_setup(_hass: HomeAssistant, _config: dict) -> bool:
-    """Set up this integration using YAML is not supported."""
-    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
