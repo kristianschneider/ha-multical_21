@@ -1,11 +1,11 @@
 {
   "domain": "multical_21",
   "name": "multical 21",
+  "codeowners": ["@mallewski", "@kristianschneider"],
+  "config_flow": true,
   "documentation": "https://github.com/mallewski/ha-multical_21/blob/main/README.md",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/mallewski/ha-multical_21/issues",
-  "version": "2.2.2",
-  "config_flow": true,
-  "codeowners": ["@mallewski", "@kristianschneider"],
-  "requirements": ["pyserial>=3.5"]
+  "requirements": ["pyserial>=3.5"],
+  "version": "2.2.2"
 }
