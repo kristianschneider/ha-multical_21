@@ -5,8 +5,8 @@ from typing import Final
 # Base component constants
 NAME: Final = "multical 21"
 DOMAIN: Final = "multical_21"
-VERSION: Final = "2.2.0"
-MODEL: Final = "382"
+VERSION: Final = "2.2.2"
+MODEL: Final = "21"
 MANUFACTURER: Final = "Kamstrup"
 ATTRIBUTION: Final = "Data provided by multical 21 meter"
 
