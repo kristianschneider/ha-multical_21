@@ -22,10 +22,10 @@ from .const import (
     DEFAULT_TIMEOUT,
     DOMAIN,
     MANUFACTURER,
+    MODEL,
     NAME,
     PLATFORMS,
     VERSION,
-    MODEL,
 )
 from .pykamstrup.kamstrup import Kamstrup
 
@@ -61,8 +61,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry_type=DeviceEntryType.SERVICE,
         identifiers={(DOMAIN, port)},
         manufacturer=MANUFACTURER,
-        name=NAME,
         model=MODEL,
+        name=NAME,
+        version=VERSION,
     )
 
     coordinator = KamstrupUpdateCoordinator(
