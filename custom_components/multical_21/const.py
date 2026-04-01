@@ -6,7 +6,7 @@ from typing import Final
 NAME: Final = "multical 21"
 DOMAIN: Final = "multical_21"
 VERSION: Final = "2.2.3"
-MODEL: Final = "21"
+MODEL: Final = "Multical 21"
 MANUFACTURER: Final = "Kamstrup"
 ATTRIBUTION: Final = "Data provided by multical 21 meter"
 
