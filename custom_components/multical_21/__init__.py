@@ -2,7 +2,7 @@
 Custom integration to integrate multical_21 with Home Assistant.
 
 For more details about this integration, please refer to
-https://github.com/kristianschneider/ha-multical_21/
+https://github.com/mallewski/ha-multical_21/
 """
 
 from datetime import timedelta
