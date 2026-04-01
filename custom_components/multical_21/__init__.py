@@ -63,7 +63,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         manufacturer=MANUFACTURER,
         model=MODEL,
         name=NAME,
-        version=VERSION,
+        sw_version=VERSION,
     )
 
     coordinator = KamstrupUpdateCoordinator(
