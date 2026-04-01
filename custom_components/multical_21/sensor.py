@@ -1,4 +1,4 @@
-"""Sensor platform for kamstrup_382."""
+"""Sensor platform for kamstrup_21."""
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
