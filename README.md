@@ -37,7 +37,7 @@ custom_components/multical_21/translations/nl.json
 custom_components/multical_21/__init__.py
 custom_components/multical_21/config_flow.py
 custom_components/multical_21/const.py
-custom_components/multical_21/kamstrup.py
+custom_components/multical_21/pykamstrup/kamstrup.py
 custom_components/multical_21/manifest.json
 custom_components/multical_21/sensor.py
 ```
