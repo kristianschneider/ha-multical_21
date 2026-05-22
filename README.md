@@ -16,39 +16,25 @@ You can also 3d Print [this mount ](https://makerworld.com/en/models/490708#prof
 
 ### HACS
 
-This component can easily be installed in your Home Assistant by [adding this repository in HACS](https://hacs.xyz/docs/faq/custom_repositories/).
+This component can be installed directly via HACS. Search for "Multical 21" in the HACS integration list and click "Download".
 
 
 ### Manual
 
-1. Using the tool of choice open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
-2. If you do not have a `custom_components` directory (folder) there, you need to create it.
-3. In the `custom_components` directory (folder) create a new folder called `multical_21`.
-4. Download _all_ the files from the `custom_components/multical_21/` directory (folder) in this repository.
-5. Place the files you downloaded in the new directory (folder) you created.
-6. Restart Home Assistant
-7. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Multical 21"
-
-Using your HA configuration directory (folder) as a starting point you should now also have these files:
-
-```text
-custom_components/multical_21/translations/en.json
-custom_components/multical_21/translations/nl.json
-custom_components/multical_21/__init__.py
-custom_components/multical_21/config_flow.py
-custom_components/multical_21/const.py
-custom_components/multical_21/pykamstrup/kamstrup.py
-custom_components/multical_21/manifest.json
-custom_components/multical_21/sensor.py
-```
+1. Open the directory for your HA configuration (where you find `configuration.yaml`).
+2. If you do not have a `custom_components` directory, create it.
+3. Download the `custom_components/multical_21/` directory from this repository as a ZIP and extract it, or clone the repository.
+4. Copy the `multical_21` folder into your `custom_components` directory.
+5. Restart Home Assistant.
+6. In the HA UI go to "Settings" → "Devices & Services", click "Add Integration" and search for "Multical 21".
 
 ## Configuration is done in the UI
 
 It's recommended to use devices as `/dev/serial/by-id` and not `/dev/ttyUSB1` as the port. This is because the first example is a stable identifier, while the second can change when USB devices are added or removed, or even when you perform a system reboot.<br>
 The port should look like this: `/dev/serial/by-id/usb-FTDI_FT230X_Basic_UART_D307PBVY-if00-port0`.
 
-Some meters contain a battery, and communicating with the meter does impact battery life. By default, this component updates every `3600` seconds (1 hour). This is configurable. Also, since version `2.0.1` you can also configure the serial timeout. The default value is `1.0` seconds, if you get the error `Finished update, No readings from the meter. Please check the IR connection` you can try to increase this value. Fractional numbers are allowed (eg. `0.5`).
-You can do this by pressing `configure` on the Integrations page:
+Some meters contain a battery, and communicating with the meter does impact battery life. By default, this component updates every `3600` seconds (1 hour). This is configurable. You can also configure the serial timeout. The default value is `1.0` seconds. If you get the error `Finished update, No readings from the meter. Please check the IR connection` you can try to increase this value. Fractional numbers are allowed (eg. `0.5`).
+Both settings can be changed by pressing "Configure" on the Integrations page.
 
 ## Collect logs
 
