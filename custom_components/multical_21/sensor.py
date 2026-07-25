@@ -13,6 +13,7 @@ from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import slugify
 
 from . import KamstrupUpdateCoordinator
 from .const import DEFAULT_NAME, DOMAIN
@@ -36,8 +37,8 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
         key="74",  # 0x004a
         name="Flow",
         icon="mdi:waves",
-        device_class=SensorDeviceClass.WATER,
-        state_class=None,
+        device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="1004",  # 0x03ec
@@ -93,7 +94,7 @@ class KamstrupSensor(CoordinatorEntity[KamstrupUpdateCoordinator], SensorEntity)
         """Initialize Kamstrup sensor."""
         super().__init__(coordinator=coordinator)
 
-        self.entity_id = f"{SENSOR_DOMAIN}.{DEFAULT_NAME}_{description.name}".lower()
+        self.entity_id = f"{SENSOR_DOMAIN}.{slugify(f'{DEFAULT_NAME}_{description.name}')}"
         self.entity_description = description
         self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {self.name}"
         self._attr_device_info = coordinator.device_info
