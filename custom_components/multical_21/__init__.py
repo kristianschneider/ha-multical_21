@@ -68,7 +68,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     coordinator = KamstrupUpdateCoordinator(
-        hass=hass, client=client, scan_interval=scan_interval, device_info=device_info
+        hass=hass,
+        entry=entry,
+        client=client,
+        scan_interval=scan_interval,
+        device_info=device_info,
     )
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
@@ -76,9 +80,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     await coordinator.async_config_entry_first_refresh()
-
-    if not coordinator.last_update_success:
-        raise ConfigEntryNotReady
 
     return True
 
@@ -104,8 +105,9 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
     def __init__(
         self,
         hass: HomeAssistant,
+        entry: ConfigEntry,
         client: Kamstrup,
-        scan_interval: int,
+        scan_interval: timedelta,
         device_info: DeviceInfo,
     ) -> None:
         """Initialize."""
@@ -114,7 +116,13 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
 
         self._commands: list[int] = []
 
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=scan_interval)
+        super().__init__(
+            hass,
+            _LOGGER,
+            config_entry=entry,
+            name=DOMAIN,
+            update_interval=scan_interval,
+        )
 
     def register_command(self, command: int) -> None:
         """Add a command to the commands list."""
