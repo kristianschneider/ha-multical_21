@@ -24,6 +24,10 @@ class Kamstrup:
         """Initialize"""
         self.ser = serial.Serial(port=serial_port, baudrate=baudrate, timeout=timeout)
 
+    def close(self) -> None:
+        """Close the serial port."""
+        self.ser.close()
+
     @classmethod
     def _crc_1021(cls, message: tuple[int]) -> int:
         """Kamstrup uses the "true" CCITT CRC-16"""

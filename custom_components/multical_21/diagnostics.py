@@ -1,16 +1,15 @@
 """Diagnostics support for multical_21."""
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from . import DOMAIN, KamstrupUpdateCoordinator
+from . import KamstrupConfigEntry
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: HomeAssistant, config_entry: KamstrupConfigEntry
 ) -> dict:
     """Return diagnostics for a config entry."""
-    coordinator: KamstrupUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator = config_entry.runtime_data
 
     return {
         "config_entry": config_entry.as_dict(),
