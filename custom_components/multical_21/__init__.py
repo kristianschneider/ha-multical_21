@@ -9,7 +9,7 @@ import logging
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
+from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
@@ -21,25 +21,22 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_TIMEOUT,
     DOMAIN,
+    MANUFACTURER,
+    MODEL,
     NAME,
-    PLATFORMS,
     VERSION,
 )
 from .pykamstrup.kamstrup import Kamstrup
 
 _LOGGER = logging.getLogger(__name__)
 
+PLATFORMS: list[Platform] = [Platform.SENSOR]
 
-async def async_setup(_hass: HomeAssistant, _config: dict) -> bool:
-    """Set up this integration using YAML is not supported."""
-    return True
+KamstrupConfigEntry = ConfigEntry["KamstrupUpdateCoordinator"]
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: KamstrupConfigEntry) -> bool:
     """Set up this integration using UI."""
-    if hass.data.get(DOMAIN) is None:
-        hass.data.setdefault(DOMAIN, {})
-
     port = entry.data.get(CONF_PORT)
     scan_interval_seconds = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
     scan_interval = timedelta(seconds=scan_interval_seconds)
@@ -62,9 +59,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     device_info = DeviceInfo(
         entry_type=DeviceEntryType.SERVICE,
         identifiers={(DOMAIN, port)},
-        manufacturer=NAME,
+        manufacturer=MANUFACTURER,
+        model=MODEL,
         name=NAME,
-        model=VERSION,
+        sw_version=VERSION,
     )
 
     coordinator = KamstrupUpdateCoordinator(
@@ -75,27 +73,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         device_info=device_info,
     )
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
+    entry.runtime_data = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     await coordinator.async_config_entry_first_refresh()
 
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
+
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: KamstrupConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        coordinator = hass.data[DOMAIN].pop(entry.entry_id)
-        await coordinator.async_close()
+        await entry.runtime_data.async_close()
 
     return unload_ok
 
 
-async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Reload a config entry."""
+async def async_reload_entry(hass: HomeAssistant, entry: KamstrupConfigEntry) -> None:
+    """Reload a config entry when its options change."""
     await hass.config_entries.async_reload(entry.entry_id)
 
 
@@ -135,9 +134,9 @@ class KamstrupUpdateCoordinator(DataUpdateCoordinator):
         self._commands.remove(command)
 
     async def async_close(self) -> None:
-        """Close resources."""
+        """Close the serial connection to the meter."""
         _LOGGER.debug("Closing Kamstrup connection")
-        self.kamstrup = None
+        await self.hass.async_add_executor_job(self.kamstrup.close)
 
     async def _async_update_data(self) -> dict[int, Any]:
         """Update data via library."""

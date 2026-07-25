@@ -1,5 +1,14 @@
 """Adds config flow for multical 21."""
-from homeassistant import config_entries
+from __future__ import annotations
+
+from typing import Any
+
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
 from homeassistant.const import CONF_PORT, CONF_SCAN_INTERVAL, CONF_TIMEOUT
 from homeassistant.core import callback
 import serial
@@ -14,78 +23,66 @@ def _test_serial_port(port: str, baudrate: int, timeout: float) -> None:
     s.close()
 
 
-class KamstrupFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+class KamstrupFlowHandler(ConfigFlow, domain=DOMAIN):
     """Config flow for multical 21."""
 
     VERSION = 1
 
-    def __init__(self):
-        """Initialize."""
-        self._errors = {}
-
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
-        self._errors = {}
-
-        if self._async_current_entries():
-            return self.async_abort(reason="single_instance_allowed")
+        errors: dict[str, str] = {}
 
         if user_input is not None:
-            if user_input[CONF_PORT] is not None:
-                try:
-                    await self.hass.async_add_executor_job(
-                        _test_serial_port,
-                        user_input[CONF_PORT],
-                        DEFAULT_BAUDRATE,
-                        DEFAULT_TIMEOUT,
-                    )
-
-                    return self.async_create_entry(
-                        title=user_input[CONF_PORT], data=user_input
-                    )
-                except serial.SerialException:
-                    self._errors["base"] = "port"
+            try:
+                await self.hass.async_add_executor_job(
+                    _test_serial_port,
+                    user_input[CONF_PORT],
+                    DEFAULT_BAUDRATE,
+                    DEFAULT_TIMEOUT,
+                )
+            except serial.SerialException:
+                errors["base"] = "port"
             else:
-                self._errors["base"] = "port"
+                return self.async_create_entry(
+                    title=user_input[CONF_PORT], data=user_input
+                )
 
-            return await self._show_config_form(user_input)
-
-        user_input = {}
-        user_input[CONF_PORT] = ""
-
-        return await self._show_config_form(user_input)
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry):
-        return KamstrupOptionsFlowHandler()
-
-    async def _show_config_form(self, user_input):
-        """Show the configuration form to edit location data."""
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_PORT, default=user_input[CONF_PORT]): str,
+                    vol.Required(
+                        CONF_PORT, default=(user_input or {}).get(CONF_PORT, "")
+                    ): str,
                 }
             ),
-            errors=self._errors,
+            errors=errors,
         )
 
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> KamstrupOptionsFlowHandler:
+        """Get the options flow for this handler."""
+        return KamstrupOptionsFlowHandler()
 
-class KamstrupOptionsFlowHandler(config_entries.OptionsFlow):
+
+class KamstrupOptionsFlowHandler(OptionsFlow):
     """Kamstrup config flow options handler."""
 
-    async def async_step_init(self, user_input=None):
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Manage the options."""
         return await self.async_step_user()
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
         if user_input is not None:
-            return self.async_create_entry(
-                title=self.config_entry.data.get(CONF_PORT), data=user_input
-            )
+            return self.async_create_entry(data=user_input)
 
         return self.async_show_form(
             step_id="user",

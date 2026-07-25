@@ -1,22 +1,18 @@
-"""Sensor platform for kamstrup_382."""
+"""Sensor platform for multical_21."""
 
 from homeassistant.components.sensor import (
-    DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.util import slugify
 
-from . import KamstrupUpdateCoordinator
-from .const import DEFAULT_NAME, DOMAIN
+from . import KamstrupConfigEntry, KamstrupUpdateCoordinator
+from .const import DEFAULT_NAME
 
 DESCRIPTIONS: list[SensorEntityDescription] = [
     SensorEntityDescription(
@@ -61,29 +57,26 @@ DESCRIPTIONS: list[SensorEntityDescription] = [
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: KamstrupConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Kamstrup sensors based on a config entry."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
 
-    entities: list[KamstrupSensor] = []
-
-    # Add all meter sensors described above.
-    for description in DESCRIPTIONS:
-        entities.append(
-            KamstrupMeterSensor(
-                coordinator=coordinator,
-                entry_id=entry.entry_id,
-                description=description,
-            )
+    async_add_entities(
+        KamstrupMeterSensor(
+            coordinator=coordinator,
+            entry_id=entry.entry_id,
+            description=description,
         )
-
-    async_add_entities(entities)
+        for description in DESCRIPTIONS
+    )
 
 
 class KamstrupSensor(CoordinatorEntity[KamstrupUpdateCoordinator], SensorEntity):
     """Defines a Kamstrup sensor."""
+
+    _attr_has_entity_name = True
 
     def __init__(
         self,
@@ -94,9 +87,10 @@ class KamstrupSensor(CoordinatorEntity[KamstrupUpdateCoordinator], SensorEntity)
         """Initialize Kamstrup sensor."""
         super().__init__(coordinator=coordinator)
 
-        self.entity_id = f"{SENSOR_DOMAIN}.{slugify(f'{DEFAULT_NAME}_{description.name}')}"
         self.entity_description = description
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {self.name}"
+        # The unique_id format is kept identical to previous releases so
+        # existing registry entries (and their entity_ids) are preserved.
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.name}"
         self._attr_device_info = coordinator.device_info
 
 
