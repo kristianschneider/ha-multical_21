@@ -14,6 +14,12 @@ You can also 3d Print [this mount ](https://makerworld.com/en/models/490708#prof
 
 ## Installation
 
+### #d printed holder
+I ended up using this to keep it in place:
+[https://makerworld.com/en/models/1814724-smartgateways-kamst-ir-gateway-mount](https://makerworld.com/en/models/1814724-smartgateways-kamst-ir-gateway-mount)
+<img width="1440" height="1920" alt="image" src="https://github.com/user-attachments/assets/3c1a3fad-550c-45c7-a8a2-f2176b8fa492" />
+
+
 ### HACS
 
 This component can easily be installed in your Home Assistant by [adding this repository in HACS](https://hacs.xyz/docs/faq/custom_repositories/).
