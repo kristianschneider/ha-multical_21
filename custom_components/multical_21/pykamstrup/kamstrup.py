@@ -108,8 +108,14 @@ class Kamstrup:
             else:
                 response_data.append(bytearray_data[i])
                 i += 1
-        if self._crc_1021(response_data):
-            _LOGGER.debug("CRC error")
+        if len(response_data) < 3 or self._crc_1021(response_data):
+            # A frame with a bad CRC must be dropped. A single flipped bit in
+            # the volume register (e.g. 2^23 L) is otherwise accepted as a
+            # real reading and pollutes utility meters and statistics.
+            _LOGGER.warning(
+                "CRC error, discarding frame: %s", response_data.hex()
+            )
+            return None
         return response_data[:-2]
 
     @classmethod

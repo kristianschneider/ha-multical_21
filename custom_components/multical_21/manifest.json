@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/kristianschneider/ha-multical_21/issues",
   "requirements": ["pyserial==3.5"],
   "single_config_entry": true,
-  "version": "2.2.0"
+  "version": "2.2.1"
 }
